@@ -18,8 +18,9 @@ module scene
 
 contains
 
-  subroutine scene_render(buffer)
+  subroutine scene_render(buffer, t)
     real, allocatable, intent(inout) :: buffer(:,:,:)
+    integer, intent(in) :: t
 
     integer :: image_width, image_height
     real :: aspect_ratio
@@ -41,7 +42,7 @@ contains
     image_height = size(buffer,3)
     aspect_ratio = real(image_width) / image_height
 
-    viewport_height = 2.0
+    viewport_height = (1+sin(t/30.0)**2)  * 2.0
     viewport_width = viewport_height * aspect_ratio
     focal_length = 1.0
 

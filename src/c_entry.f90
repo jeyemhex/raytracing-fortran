@@ -8,14 +8,14 @@
 !------------------------------------------------------------------------------#
 ! This code is distributed under the MIT license.
 !==============================================================================#
-subroutine update_buffer_fortran(c_buffer, width, height)
+subroutine update_buffer_fortran(c_buffer, width, height, t)
   use iso_c_binding
   use omp_lib
   use scene
   implicit none
 
   real(c_float), intent(inout) :: c_buffer(3, width, height)
-  integer, intent(in) :: width, height
+  integer(c_int), intent(in) :: width, height, t
 
   real, allocatable :: buffer(:,:,:)
   double precision :: start, finish
@@ -23,7 +23,7 @@ subroutine update_buffer_fortran(c_buffer, width, height)
   start = omp_get_wtime()
 
   allocate(buffer(3,width,height))
-  call scene_render(buffer)
+  call scene_render(buffer, t)
   c_buffer = buffer
   deallocate(buffer)
 

@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 
-extern void update_buffer_fortran(float*, int*, int*);
+extern void update_buffer_fortran_(float*, int*, int*);
 
 #include <GL/glut.h>
 #include <stdlib.h>
@@ -36,7 +36,7 @@ void initBuffer() {
 
 // Update the color array and redisplay the window
 void updateBuffer(void) {
-    update_buffer_fortran(buffer, &WIDTH, &HEIGHT);
+    update_buffer_fortran_(buffer, &WIDTH, &HEIGHT);
     glutPostRedisplay();
 }
 

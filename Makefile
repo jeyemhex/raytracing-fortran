@@ -1,22 +1,22 @@
-CC = gcc
-FC = gfortran
-CFLAGS = -Wall -Wextra -std=c99 -g
-FFLAGS = -g -fno-underscoring
-LDFLAGS = -lGL -lglut -lgfortran
+CC = nvc
+FC = nvfortran
+CFLAGS = -Wall -Wextra -g
+FFLAGS = -g
+LDFLAGS = -lGL -lglut -lnvf
 OBJ = src/main.o
-F90_OBJ = src/c_entry.o
+SHARED_OBJ = src/c_entry.so
 TARGET = raytracing-fortran
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ) $(F90_OBJ)
+$(TARGET): $(OBJ) $(SHARED_OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
+
+$(SHARED_OBJ): src/c_entry.f90
+	$(FC) -c -fpic -shared $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.o: %.f90
-	$(FC) $(FFLAGS) -c $< -o $@
-
 clean:
-	rm -f $(OBJ) $(F90_OBJ) $(TARGET)
+	rm -f $(OBJ) $(SHARED_OBJ) $(TARGET)

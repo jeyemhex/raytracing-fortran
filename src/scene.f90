@@ -32,7 +32,7 @@ contains
     real :: vertical(3)
     real :: lower_left_corner(3)
 
-    type(ray_class) :: r
+    type(ray_class) :: ray
     real :: u, v
     integer :: i, j
 
@@ -53,25 +53,57 @@ contains
       do j = 1, image_height
         u = real(i) / image_width
         v = real(j) / image_height
-        r = ray_class(origin = origin, direction = lower_left_corner + v*vertical + u*horizontal - origin)
-        buffer(:,i,j) = ray_color(r)
+        ray = ray_class(origin = origin, direction = lower_left_corner + v*vertical + u*horizontal - origin)
+        buffer(:,i,j) = ray_color(ray)
       end do
     end do
 
 
   end subroutine scene_render
 
-  function ray_color(r)
-    class(ray_class), intent(in) :: r
+  function ray_color(ray)
+    class(ray_class), intent(in) :: ray
     real :: ray_color(3)
 
     real :: unit_direction(3)
     real :: t
 
-    unit_direction = r%direction / norm2(r%direction)
+    unit_direction = ray%direction / norm2(ray%direction)
     t = 0.5 * unit_direction(2) + 1
-    ray_color = (1-t)*[1.0, 1.0, 1.0] + t*[0.5, 0.7, 1.0]
+    if (hit_sphere([-1.0,0.0,0.0], 0.5, ray)) then
+      ray_color = [1,0,0]
+    else
+      ray_color = (1-t)*[1.0, 1.0, 1.0] + t*[0.5, 0.7, 1.0]
+    end if
 
   end function ray_color
+
+  function hit_sphere(center, radius, ray)
+    logical :: hit_sphere
+    real, intent(in) :: center(3)
+    real, intent(in) :: radius
+    class(ray_class), intent(in) :: ray
+
+    real :: origin(3)
+    real :: oc(3)
+    real :: a, b, c
+    real :: discriminant
+
+    oc = origin - center
+    a = norm2(ray%direction)**2
+    b = 2*dot_product(oc, ray%direction)
+    c = norm2(oc)**2 - radius**2
+
+    discriminant = b**2 - 4*a*c
+
+    hit_sphere = (discriminant > 0)
+!EJH!     if (discriminant > 0) then
+!EJH!       hit_sphere = .true.
+!EJH!     else
+!EJH!       hit_sphere = .false.
+!EJH!     end if
+
+  end function hit_sphere
+
 
 end module scene

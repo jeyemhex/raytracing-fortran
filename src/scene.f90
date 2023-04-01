@@ -9,6 +9,7 @@ module scene
 ! This code is distributed under the MIT license.
 !==============================================================================#
   use rays
+  use omp_lib
   implicit none
 
   private
@@ -58,7 +59,6 @@ contains
       end do
     end do
 
-
   end subroutine scene_render
 
   function ray_color(ray)
@@ -66,42 +66,44 @@ contains
     real :: ray_color(3)
 
     real :: unit_direction(3)
+    real :: normal(3)
     real :: t
 
     unit_direction = ray%direction / norm2(ray%direction)
-    t = 0.5 * unit_direction(2) + 1
-    if (hit_sphere([-1.0,0.0,0.0], 0.5, ray)) then
-      ray_color = [1,0,0]
+    t = hit_sphere([-1.0,0.0,0.0], 0.5, ray)
+    if (t > 0) then
+      normal = ray%at(t) / norm2(ray%at(t)) - [-1, 0, 0]
+      ray_color = 0.5  * (normal+1)
     else
+      t = 0.5 * unit_direction(2) + 1
       ray_color = (1-t)*[1.0, 1.0, 1.0] + t*[0.5, 0.7, 1.0]
     end if
 
   end function ray_color
 
   function hit_sphere(center, radius, ray)
-    logical :: hit_sphere
+    real :: hit_sphere
     real, intent(in) :: center(3)
     real, intent(in) :: radius
     class(ray_class), intent(in) :: ray
 
     real :: origin(3)
     real :: oc(3)
-    real :: a, b, c
+    real :: a, half_b, c
     real :: discriminant
 
     oc = origin - center
     a = norm2(ray%direction)**2
-    b = 2*dot_product(oc, ray%direction)
+    half_b = dot_product(oc, ray%direction)
     c = norm2(oc)**2 - radius**2
 
-    discriminant = b**2 - 4*a*c
+    discriminant = half_b**2 - a*c
 
-    hit_sphere = (discriminant > 0)
-!EJH!     if (discriminant > 0) then
-!EJH!       hit_sphere = .true.
-!EJH!     else
-!EJH!       hit_sphere = .false.
-!EJH!     end if
+    if (discriminant < 0) then
+      hit_sphere = -1.0
+    else
+      hit_sphere = (-half_b - sqrt(discriminant)) / a
+    end if
 
   end function hit_sphere
 

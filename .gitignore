@@ -33,3 +33,6 @@
 
 # Vim temporary files
 .*.sw*
+
+# Binaries
+raytracing-fortran

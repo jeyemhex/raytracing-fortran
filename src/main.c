@@ -19,8 +19,8 @@ extern void update_buffer_fortran_(float*, int*, int*);
 #include <stdlib.h>
 
 float FPS = 60;
-int WIDTH = 1920;
-int HEIGHT = 1080;
+int WIDTH = 600;
+int HEIGHT = 400;
 
 // Define the color array
 int NUM_PIXELS;
@@ -52,10 +52,6 @@ void display() {
     glutSwapBuffers();
 
     glFlush();
-}
-
-void timer(void) {
-
 }
 
 int main(int argc, char** argv) {

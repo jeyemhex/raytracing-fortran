@@ -1,8 +1,8 @@
 CC = nvc
 FC = nvfortran
 CFLAGS = -Wall -Wextra -g
-FFLAGS = -g
-LDFLAGS = -lGL -lglut -lnvf
+FFLAGS = -O3 -g -mp
+LDFLAGS = -lGL -lglut -lnvf -mp
 SHARED_OBJ = c_entry.so
 TARGET = raytracing-fortran
 OBJ = scene.o rays.o

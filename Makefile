@@ -3,20 +3,26 @@ FC = nvfortran
 CFLAGS = -Wall -Wextra -g
 FFLAGS = -g
 LDFLAGS = -lGL -lglut -lnvf
-OBJ = src/main.o
-SHARED_OBJ = src/c_entry.so
+SHARED_OBJ = c_entry.so
 TARGET = raytracing-fortran
+OBJ = scene.o rays.o
+
+vpath %.f90 src/
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ) $(SHARED_OBJ)
+$(TARGET): src/main.c $(OBJ) $(SHARED_OBJ) $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(SHARED_OBJ): src/c_entry.f90
 	$(FC) -c -fpic -shared $< -o $@
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(SHARED_OBJ): scene.o
+
+scene.o: rays.o
+
+%.o: %.f90
+	$(FC) $(FCFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ) $(SHARED_OBJ) $(TARGET)
+	rm -f *.o *.mod *.so $(TARGET)

@@ -1,26 +1,35 @@
+module rays
 !==============================================================================#
-! C_ENTRY
+! RAYS
 !------------------------------------------------------------------------------#
 ! Author:  Ed Higgins <ed.higgins@york.ac.uk>
-!    with the help of ChatGPT-3
 !------------------------------------------------------------------------------#
 ! Version: 0.1.1, 2023-04-01
 !------------------------------------------------------------------------------#
 ! This code is distributed under the MIT license.
 !==============================================================================#
-subroutine update_buffer_fortran(c_buffer, width, height)
-  use iso_c_binding
-  use scene
   implicit none
 
-  real(c_float), intent(inout) :: c_buffer(3, width, height)
-  integer, intent(in) :: width, height
+  private
 
-  real, allocatable :: buffer(:,:,:)
+  type, public :: ray_class
+    real :: origin(3)
+    real :: direction(3)
 
-  allocate(buffer(3,width,height))
-  call scene_render(buffer)
-  c_buffer = buffer
-  deallocate(buffer)
+  contains
+    procedure :: at => ray_at
 
-end subroutine update_buffer_fortran
+  end type ray_class
+
+contains
+
+  function ray_at(this, t)
+    real :: ray_at(3)
+
+    class(ray_class), intent(in) :: this
+    real,             intent(in) :: t
+
+    ray_at = this%origin + t * this%direction
+  end function ray_at
+
+end module rays
